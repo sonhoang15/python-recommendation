@@ -11,9 +11,12 @@ with open("products.json", "r", encoding="utf-8") as f:
     products = json.load(f)
 
 with open("embeddings.json", "r") as f:
-    embeddings = np.array(json.load(f))
+    embeddings = np.array(json.load(f), dtype=np.float32)
 
-model = SentenceTransformer("all-MiniLM-L6-v2")
+model = SentenceTransformer(
+    "all-MiniLM-L6-v2",
+    device="cpu"
+)
 
 class RecommendRequest(BaseModel):
     text: str
