@@ -3,8 +3,12 @@ import json
 import requests
 from sentence_transformers import SentenceTransformer
 from datetime import datetime
+import numpy as np
 
-API_URL = os.getenv("PRODUCT_API_URL", "http://localhost:8080/api/v1/product/read")
+API_URL = os.getenv(
+    "PRODUCT_API_URL",
+    "http://localhost:8080/api/v1/product/read"
+)
 TIMEOUT = 10
 
 print("Fetching products from:", API_URL)
@@ -20,10 +24,26 @@ def build_text(p):
     desc = p.get("description") or ""
     return f"{name}. {desc}".strip()
 
-texts = [build_text(p) for p in products]
+texts = []
+valid_products = []
+
+for p in products:
+    text = build_text(p)
+    if text:
+        texts.append(text)
+        valid_products.append(p)
+
+products = valid_products
+
+print(f"Embedding {len(products)} products...")
 
 model = SentenceTransformer("all-MiniLM-L6-v2")
-embeddings = model.encode(texts, show_progress_bar=True).tolist()
+
+embeddings = model.encode(
+    texts,
+    show_progress_bar=True,
+    convert_to_numpy=True
+).astype(np.float32)
 
 with open("products.json", "w", encoding="utf-8") as f:
     json.dump(products, f, ensure_ascii=False, indent=2)
@@ -33,7 +53,7 @@ with open("embeddings.json", "w", encoding="utf-8") as f:
         "model": "all-MiniLM-L6-v2",
         "created_at": datetime.utcnow().isoformat(),
         "count": len(embeddings),
-        "vectors": embeddings
+        "vectors": embeddings.tolist()
     }, f, indent=2)
 
-print(f"DONE: {len(products)} products embedded")
+print(f" DONE: {len(products)} products embedded")
