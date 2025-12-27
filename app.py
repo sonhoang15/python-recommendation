@@ -11,7 +11,14 @@ with open("products.json", "r", encoding="utf-8") as f:
 
 with open("embeddings.json", "r") as f:
     data = json.load(f)
-    embeddings = np.array(data["vectors"], dtype=np.float32)
+
+    if isinstance(data, dict):
+        vectors = data["vectors"]
+    else:
+        vectors = data 
+
+    embeddings = np.array(vectors, dtype=np.float32)
+
 
 model = SentenceTransformer("all-MiniLM-L6-v2", device="cpu")
 
