@@ -6,4 +6,4 @@ numpy
 scikit-learn
 requests
 sentence-transformers
-torch==2.1.2+cpu
+torch==2.9.1+cpu
