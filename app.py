@@ -57,3 +57,7 @@ def recommend(req: RecommendRequest):
     except Exception as e:
         print(" ERROR:", e)
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/")
+def health_check():
+    return {"status": "ok"}
